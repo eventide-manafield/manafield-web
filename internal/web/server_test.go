@@ -20,7 +20,7 @@ func TestHealth(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler, err := New(client, "test-version")
+	handler, err := New(client, "test-version", "/")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestHomeListsRegistryModules(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler, err := New(client, "test-version")
+	handler, err := New(client, "test-version", "/")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestHomeDegradesWhenCoreUnavailable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler, err := New(client, "test-version")
+	handler, err := New(client, "test-version", "/")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,5 +98,49 @@ func TestHomeDegradesWhenCoreUnavailable(t *testing.T) {
 	}
 	if !strings.Contains(response.Body.String(), "Registry unavailable") {
 		t.Fatalf("expected degraded state in body: %s", response.Body.String())
+	}
+}
+
+func TestPrefixBasePath(t *testing.T) {
+	coreServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte("[]"))
+	}))
+	defer coreServer.Close()
+
+	client, err := coreclient.New(coreServer.URL, coreServer.Client())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler, err := New(client, "test-version", "/_manafield")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	request := httptest.NewRequest(http.MethodGet, "/_manafield/", nil)
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", response.Code)
+	}
+
+	body := response.Body.String()
+	for _, want := range []string{
+		`href="/_manafield/static/app.css"`,
+		`href="/_manafield/"`,
+	} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("expected %q in body", want)
+		}
+	}
+
+	healthRequest := httptest.NewRequest(http.MethodGet, "/_manafield/manafield/health", nil)
+	healthResponse := httptest.NewRecorder()
+	handler.ServeHTTP(healthResponse, healthRequest)
+
+	if healthResponse.Code != http.StatusOK {
+		t.Fatalf("expected prefixed health 200, got %d", healthResponse.Code)
 	}
 }

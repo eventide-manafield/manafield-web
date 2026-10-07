@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>Manafield</title>
-  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="{{.StaticPath}}/app.css">
 </head>
 <body>
   <div class="sky" aria-hidden="true"></div>
   <main class="shell">
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Manafield home">
+      <a class="brand" href="{{.HomePath}}" aria-label="Manafield shell home">
         <span class="brand-mark">M</span>
         <span>
           <strong>Manafield</strong>

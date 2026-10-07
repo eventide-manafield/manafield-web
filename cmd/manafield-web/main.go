@@ -23,7 +23,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	handler, err := shell.New(client, version)
+	basePath := envOr("MANAFIELD_WEB_BASE_PATH", "/")
+
+	handler, err := shell.New(client, version, basePath)
 	if err != nil {
 		slog.Error("failed to initialize Web Shell", "error", err)
 		os.Exit(1)
