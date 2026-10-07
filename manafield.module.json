@@ -1,0 +1,29 @@
+{
+  "id": "manafield-web",
+  "name": "Manafield Web",
+  "description": "Official lightweight Web Shell for a Manafield instance.",
+  "version": "0.0.1",
+  "healthOperation": "health",
+  "operations": [
+    {
+      "id": "health",
+      "input": null,
+      "output": {
+        "type": "object",
+        "required": ["status", "service", "version"],
+        "properties": {
+          "status": { "type": "string" },
+          "service": { "type": "string" },
+          "version": { "type": "string" }
+        }
+      },
+      "binding": {
+        "type": "http",
+        "method": "GET",
+        "path": "/manafield/health",
+        "codecs": ["json"]
+      },
+      "description": "Reports whether the official Manafield Web Shell is healthy."
+    }
+  ]
+}

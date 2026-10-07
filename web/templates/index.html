@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Manafield</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <div class="sky" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Manafield home">
+        <span class="brand-mark">M</span>
+        <span>
+          <strong>Manafield</strong>
+          <small>Observation Shell</small>
+        </span>
+      </a>
+      <span class="version">web {{.Version}}</span>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">OBSERVATION FIELD / INSTANCE HOME</p>
+      <h1>연결된 기능을<br><span>하나의 필드에서.</span></h1>
+      <p class="lead">
+        Manafield Web은 Core와 Module을 대신하지 않아.
+        현재 Instance에 연결된 표면을 발견하고, 그곳으로 이어주는 가벼운 Shell이야.
+      </p>
+      <div class="registry-state {{if .CoreAvailable}}ok{{else}}degraded{{end}}">
+        <span class="signal"></span>
+        {{if .CoreAvailable}}
+          <strong>Registry connected</strong>
+          <span>{{.ModuleCount}} modules observed</span>
+        {{else}}
+          <strong>Registry unavailable</strong>
+          <span>Shell은 계속 동작 중이야. Core 연결을 확인해줘.</span>
+        {{end}}
+      </div>
+    </section>
+
+    <section class="modules" aria-labelledby="modules-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">REGISTRY</p>
+          <h2 id="modules-title">Observed Modules</h2>
+        </div>
+        {{if .CoreAvailable}}<span class="count">{{.ModuleCount}}</span>{{end}}
+      </div>
+
+      {{if not .CoreAvailable}}
+        <div class="empty">
+          <strong>Core Registry를 읽지 못했어.</strong>
+          <p>라우팅된 다른 Module은 계속 접근 가능할 수 있어.</p>
+        </div>
+      {{else if eq .ModuleCount 0}}
+        <div class="empty">
+          <strong>아직 관측된 Module이 없어.</strong>
+          <p>Core Registry에 Module이 등록되면 이곳에 나타나.</p>
+        </div>
+      {{else}}
+        <div class="module-grid">
+          {{range .Modules}}
+          <article class="module-card">
+            <div class="module-card__meta">
+              <span class="module-id">{{.ID}}</span>
+              <span class="module-version">v{{.Version}}</span>
+            </div>
+            <h3>{{.Name}}</h3>
+            {{with .Description}}
+              <p>{{.}}</p>
+            {{else}}
+              <p class="muted">설명이 등록되지 않은 Module.</p>
+            {{end}}
+            <div class="module-card__footer">
+              <span>REGISTERED</span>
+              <span class="dot"></span>
+            </div>
+          </article>
+          {{end}}
+        </div>
+      {{end}}
+    </section>
+
+    <footer>
+      <span>MANAFIELD / OFFICIAL WEB SHELL</span>
+      <span>Headless Core · Independent Modules</span>
+    </footer>
+  </main>
+</body>
+</html>
